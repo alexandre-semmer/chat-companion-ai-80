@@ -1,24 +1,34 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { useEffect, useRef } from "react";
+import { ensureBootstrapThread, useChatState } from "@/lib/chat-store";
 
-// No head() here: the home route inherits title/description/og/twitter from
-// __root.tsx, and ships no og:image so serve-time hosting can inject the
-// project's social preview (explicit og:image or latest screenshot).
 export const Route = createFileRoute("/")({
   component: Index,
 });
 
-// IMPORTANT: Replace this placeholder. See ./README.md for routing conventions.
 function Index() {
+  const navigate = useNavigate();
+  const threads = useChatState((s) => s.threads);
+  const bootstrappedRef = useRef(false);
+
+  useEffect(() => {
+    if (bootstrappedRef.current) return;
+    bootstrappedRef.current = true;
+    const t = ensureBootstrapThread();
+    void navigate({ to: "/c/$threadId", params: { threadId: t.id }, replace: true });
+  }, [navigate]);
+
+  // Fallback: if threads become available before effect commits (SSR->hydration)
+  useEffect(() => {
+    if (threads[0] && !bootstrappedRef.current) {
+      bootstrappedRef.current = true;
+      void navigate({ to: "/c/$threadId", params: { threadId: threads[0].id }, replace: true });
+    }
+  }, [threads, navigate]);
+
   return (
-    <div
-      className="flex min-h-screen items-center justify-center"
-      style={{ backgroundColor: "#fcfbf8" }}
-    >
-      <img
-        data-lovable-blank-page-placeholder="REMOVE_THIS"
-        src="https://cdn.gpteng.co/blank-app-v1.svg"
-        alt="Your app will live here!"
-      />
+    <div className="grid h-full place-items-center text-sm text-muted-foreground">
+      Carregando...
     </div>
   );
 }
