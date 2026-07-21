@@ -38,11 +38,9 @@ jobs:
           cp dist/client/index.html dist/client/404.html
           touch dist/client/.nojekyll
 
-      # enablement: turns Pages on (source = GitHub Actions) if it isn't already,
-      # so no manual step in Settings > Pages is needed.
+      # Requires Pages already enabled with source "GitHub Actions"
+      # (Settings > Pages > Build and deployment > Source).
       - uses: actions/configure-pages@v5
-        with:
-          enablement: true
 
       - uses: actions/upload-pages-artifact@v3
         with:
