@@ -53,7 +53,7 @@ interface Props {
 
 export function ChatWindow({ threadId }: Props) {
   const thread = useChatState((s) => s.threads.find((t) => t.id === threadId));
-  const messages = useChatState((s) => s.messages[threadId] ?? []);
+  const messages = useChatState((s) => s.messages[threadId]) ?? EMPTY_MESSAGES;
   const [isTyping, setIsTyping] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [editingTitle, setEditingTitle] = useState(false);
