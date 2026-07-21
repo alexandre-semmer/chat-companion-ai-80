@@ -27,6 +27,9 @@ const listeners = new Set<() => void>();
 
 let state: ChatState = { threads: [], messages: {} };
 let hydrated = false;
+const EMPTY_MESSAGES: Message[] = [];
+export { EMPTY_MESSAGES };
+
 
 function isBrowser() {
   return typeof window !== "undefined";
