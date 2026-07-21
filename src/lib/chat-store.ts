@@ -151,3 +151,16 @@ export function appendMessage(threadId: string, role: Role, content: string): Me
   });
   return msg;
 }
+
+export function updateMessageContent(threadId: string, messageId: string, content: string) {
+  setState((s) => {
+    const list = s.messages[threadId] ?? [];
+    const nextList = list.map((m) => (m.id === messageId ? { ...m, content } : m));
+    const preview = content.replace(/\s+/g, " ").slice(0, 80);
+    const threads = s.threads.map((t) =>
+      t.id === threadId ? { ...t, updatedAt: Date.now(), lastMessagePreview: preview } : t,
+    );
+    threads.sort((a, b) => b.updatedAt - a.updatedAt);
+    return { ...s, threads, messages: { ...s.messages, [threadId]: nextList } };
+  });
+}

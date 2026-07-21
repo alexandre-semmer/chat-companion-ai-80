@@ -30,9 +30,10 @@ import {
   appendMessage,
   deleteThread,
   renameThread,
+  updateMessageContent,
   useChatState,
 } from "@/lib/chat-store";
-import { mockAssistantReply } from "@/lib/mock-assistant";
+import { streamOllamaChat, type OllamaMessage } from "@/lib/ollama-client";
 import { Markdown } from "./Markdown";
 import { Composer } from "./Composer";
 import { cn } from "@/lib/utils";
@@ -59,6 +60,7 @@ export function ChatWindow({ threadId }: Props) {
   const [titleDraft, setTitleDraft] = useState(thread?.title ?? "");
   const scrollRef = useRef<HTMLDivElement>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
+  const abortControllerRef = useRef<AbortController | null>(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -68,6 +70,12 @@ export function ChatWindow({ threadId }: Props) {
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
   }, [messages.length, isTyping]);
+
+  useEffect(() => {
+    return () => {
+      abortControllerRef.current?.abort();
+    };
+  }, []);
 
   if (!thread) {
     return (
@@ -85,10 +93,39 @@ export function ChatWindow({ threadId }: Props) {
   const handleSend = async (text: string) => {
     appendMessage(threadId, "user", text);
     setIsTyping(true);
+
+    const assistantMsg = appendMessage(threadId, "assistant", "");
+    const accumulated = { current: "" };
+    abortControllerRef.current = new AbortController();
+
+    const history: OllamaMessage[] = [
+      ...messages.map((m) => ({ role: m.role as "user" | "assistant", content: m.content })),
+      { role: "user", content: text },
+    ];
+
     try {
-      const reply = await mockAssistantReply(text);
-      appendMessage(threadId, "assistant", reply);
+      await streamOllamaChat({
+        model: "llama3.2",
+        messages: history,
+        signal: abortControllerRef.current.signal,
+        onChunk: (chunk) => {
+          accumulated.current += chunk;
+          updateMessageContent(threadId, assistantMsg.id, accumulated.current);
+        },
+      });
+    } catch (error) {
+      if ((error as Error).name === "AbortError") {
+        updateMessageContent(
+          threadId,
+          assistantMsg.id,
+          `${accumulated.current}\n\n_(resposta interrompida)_`,
+        );
+      } else {
+        const errMsg = error instanceof Error ? error.message : String(error);
+        updateMessageContent(threadId, assistantMsg.id, `Erro ao chamar Ollama: ${errMsg}`);
+      }
     } finally {
+      abortControllerRef.current = null;
       setIsTyping(false);
     }
   };
