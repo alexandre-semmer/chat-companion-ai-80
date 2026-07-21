@@ -1,5 +1,5 @@
 const DEFAULT_BASE_URL = "http://localhost:11434";
-const DEFAULT_MODEL = "llama3.2";
+const DEFAULT_MODEL = "ministral-3:3b";
 
 export interface OllamaMessage {
   role: "system" | "user" | "assistant";

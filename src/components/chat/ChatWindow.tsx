@@ -106,7 +106,7 @@ export function ChatWindow({ threadId }: Props) {
 
     try {
       await streamOllamaChat({
-        model: "llama3.2",
+        model: "ministral-3:3b",
         messages: history,
         signal: abortControllerRef.current.signal,
         onChunk: (chunk) => {
