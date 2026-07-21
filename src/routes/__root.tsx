@@ -88,10 +88,14 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       {
         property: "og:description",
         content:
-          "Interface conversacional minimalista para conversar com IA e organizar tudo em salas.",
+          "Lumen é uma interface de chat com IA, minimalista e focada, para organizar suas conversas em salas.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:title", content: "Lumen — Chat com IA" },
+      { name: "twitter:description", content: "Lumen é uma interface de chat com IA, minimalista e focada, para organizar suas conversas em salas." },
+      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/e9a765a2-e884-4f3b-90fe-7b4d8301d0fe/id-preview-bc6ba5b6--aa2a1ee2-c965-47b5-a6e3-bb8f0c9cb59c.lovable.app-1784588885553.png" },
+      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/e9a765a2-e884-4f3b-90fe-7b4d8301d0fe/id-preview-bc6ba5b6--aa2a1ee2-c965-47b5-a6e3-bb8f0c9cb59c.lovable.app-1784588885553.png" },
     ],
     links: [
       {
