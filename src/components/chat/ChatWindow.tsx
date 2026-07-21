@@ -32,6 +32,7 @@ import {
   renameThread,
   updateMessageContent,
   useChatState,
+  EMPTY_MESSAGES,
 } from "@/lib/chat-store";
 import { streamOllamaChat, type OllamaMessage } from "@/lib/ollama-client";
 import { Markdown } from "./Markdown";
